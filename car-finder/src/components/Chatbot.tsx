@@ -110,27 +110,27 @@ const Chatbot = ({ cars, onCarSelect, isOpen, onToggle }: ChatbotProps) => {
     let mentionedLocation: string | undefined;
     let excludedLocation: string | undefined;
     
-    // Primeiro, verificar se há negação na frase
+    // Primeiro, verificar se há negação específica na frase
     const hasNegation = /(?:não|nao)\s+seja/i.test(message) || 
                        /que\s+(?:não|nao)\s+(?:seja|de|em)/i.test(message) ||
-                       /(?:exceto|menos|fora)\s+(?:de\s+)?/i.test(message);
-    
-    console.log('Mensagem:', message);
-    console.log('Tem negação:', hasNegation);
+                       /(?:exceto|menos|fora)\s+(?:de\s+)?(?:são paulo|sp|rio|rj)/i.test(message);
     
     if (hasNegation) {
       // Se tem negação, procurar a localização que deve ser excluída
       for (const loc of locations) {
-        if (message.includes(loc)) {
+        if (message.includes(loc) && /(?:não|nao|exceto|menos|fora).*${loc}|${loc}.*(?:não|nao|exceto|menos|fora)/.test(message)) {
           excludedLocation = loc;
-          console.log('Localização excluída:', excludedLocation);
           break;
         }
       }
     } else {
-      // Se não tem negação, procurar localização normal
-      mentionedLocation = locations.find(loc => message.includes(loc));
-      console.log('Localização mencionada:', mentionedLocation);
+      // Se não tem negação, procurar localização normal (incluindo "de Campinas", "em SP", etc.)
+      for (const loc of locations) {
+        if (message.includes(loc)) {
+          mentionedLocation = loc;
+          break;
+        }
+      }
     }
     
     // Aplicar filtros
@@ -177,63 +177,71 @@ const Chatbot = ({ cars, onCarSelect, isOpen, onToggle }: ChatbotProps) => {
     
     // Filtro de localização com exclusão
     if (excludedLocation) {
-      console.log('Aplicando filtro de exclusão para:', excludedLocation);
       const beforeCount = filteredCars.length;
       filteredCars = filteredCars.filter(car => {
         const carLocation = car.Location.toLowerCase();
         const shouldExclude = carLocation.includes(excludedLocation.toLowerCase());
-        console.log(`${car.Name} em ${car.Location} - excluir: ${shouldExclude}`);
         return !shouldExclude;
       });
       
-      console.log(`Carros antes: ${beforeCount}, depois: ${filteredCars.length}`);
-      
       if (filteredCars.length === 0 && beforeCount > 0) {
-        response = `😅 Parece que todos os carros que encontrei são de ${excludedLocation}! Que tal considerar outras opções de localização?\n\nVou mostrar algumas alternativas mesmo assim:\n\n`;
+        response = `Parece que todos os carros que encontrei são de ${excludedLocation}! Que tal considerar outras opções de localização?\n\nVou mostrar algumas alternativas mesmo assim:\n\n`;
         // Restaurar carros originais se todos foram filtrados
         filteredCars = cars.slice(0, 3);
       } else if (filteredCars.length > 0) {
-        response = `✅ Perfeito! Encontrei carros que não são de ${excludedLocation}:\n\n`;
+        response = `Perfeito! Encontrei carros que não são de ${excludedLocation}:\n\n`;
       }
     } else if (mentionedLocation) {
-      const locationMatch = filteredCars.filter(car => 
-        car.Location.toLowerCase().includes(mentionedLocation)
-      );
+      const locationMatch = filteredCars.filter(car => {
+        const carLocation = car.Location.toLowerCase();
+        const matches = carLocation.includes(mentionedLocation.toLowerCase());
+        return matches;
+      });
       
       if (locationMatch.length > 0) {
         filteredCars = locationMatch;
-      } else if (filteredCars.length > 0) {
-        response += `📍 Não encontrei esse carro em ${mentionedLocation}, mas aqui estão opções similares em outras cidades:\n\n`;
+        response = `Encontrei ${locationMatch.length} ${locationMatch.length === 1 ? 'carro' : 'carros'} em ${mentionedLocation.charAt(0).toUpperCase() + mentionedLocation.slice(1)} dentro do seu orçamento:\n\n`;
+      } else {
+        // Não encontrou carros na cidade específica
+        response = `Não encontrei carros em ${mentionedLocation.charAt(0).toUpperCase() + mentionedLocation.slice(1)} dentro do seu orçamento de até ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(maxPrice || 0)}.\n\nMas encontrei ótimas opções em cidades próximas que podem interessar:\n\n`;
+        
+        // Manter os carros filtrados por preço, mas de outras cidades
+        if (filteredCars.length === 0) {
+          // Se não há carros nem no orçamento, mostrar os mais próximos do preço
+          filteredCars = cars
+            .sort((a, b) => Math.abs(a.Price - (maxPrice || 100000)) - Math.abs(b.Price - (maxPrice || 100000)))
+            .slice(0, 3);
+        }
       }
     }
     
     // Gerar resposta contextual
     if (filteredCars.length === 0) {
-      response = `🤔 Hmm, não encontrei carros exatamente com essas especificações.\n\nQue tal tentar:\n• Aumentar a faixa de preço\n• Buscar por outras marcas similares\n• Considerar outras cidades próximas\n\nPosso sugerir algumas opções populares se quiser!`;
+      response = `Hmm, não encontrei carros exatamente com essas especificações.\n\nQue tal tentar:\n• Aumentar a faixa de preço\n• Buscar por outras marcas similares\n• Considerar outras cidades próximas\n\nPosso sugerir algumas opções populares se quiser!`;
     } else if (filteredCars.length === 1) {
       const car = filteredCars[0];
-      response = `🎯 Perfeito! Encontrei exatamente o que você procura:\n\n**${car.Name} ${car.Model}** em ${car.Location}\n💰 ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(car.Price)}\n\nEsse carro tem ótimo custo-benefício! Quer ver mais detalhes?`;
+      response = `Perfeito! Encontrei exatamente o que você procura:\n\n**${car.Name} ${car.Model}** em ${car.Location}\n${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(car.Price)}\n\nEsse carro tem ótimo custo-benefício! Quer ver mais detalhes?`;
     } else if (filteredCars.length <= 3) {
-      response = `✨ Ótima escolha! Encontrei ${filteredCars.length} opções que combinam perfeitamente com você:\n\n`;
+      response = `Ótima escolha! Encontrei ${filteredCars.length} opções que combinam perfeitamente com você:\n\n`;
     } else {
-      response = `🚗 Wow! Temos ${filteredCars.length} opções incríveis para você! Aqui estão as 3 melhores:\n\n`;
+      response = `Temos ${filteredCars.length} opções incríveis para você! Aqui estão as 3 melhores:\n\n`;
       filteredCars = filteredCars.slice(0, 3);
     }
     
     // Respostas para perguntas específicas
     if (message.includes('mais barato') || message.includes('econômico')) {
       filteredCars = cars.sort((a, b) => a.Price - b.Price).slice(0, 3);
-      response = '💰 Aqui estão os carros mais econômicos da nossa seleção:\n\n';
+      response = 'Aqui estão os carros mais econômicos da nossa seleção:\n\n';
     }
     
     if (message.includes('mais caro') || message.includes('luxo')) {
       filteredCars = cars.sort((a, b) => b.Price - a.Price).slice(0, 3);
-      response = '✨ Para você que busca o premium, temos estas opções de luxo:\n\n';
+      response = 'Para você que busca o premium, temos estas opções de luxo:\n\n';
     }
     
     if (message.includes('elétrico') || message.includes('sustentável')) {
       filteredCars = cars.filter(car => car.Name.toLowerCase().includes('byd'));
-      response = '🌱 Excelente escolha! Carros elétricos são o futuro. Confira:\n\n';
+      response = 'Excelente escolha! Carros elétricos são o futuro. Confira:\n\n';
     }
     
     return {
