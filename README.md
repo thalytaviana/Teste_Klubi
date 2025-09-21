@@ -58,8 +58,8 @@ Um buscador inteligente de carros desenvolvido em React + TypeScript, com assist
 
 1. Clone o repositório:
 \`\`\`bash
-git clone https://github.com/Inteli-College/2025-2A-T13-ES07-G01.git
-cd 2025-2A-T13-ES07-G01/Teste_Klubi/car-finder
+git clone https://github.com/thalytaviana/Teste_Klubi
+cd Teste_Klubi/car-finder
 \`\`\`
 
 2. Instale as dependências:
@@ -235,4 +235,4 @@ MIT License - veja [LICENSE.md](LICENSE.md) para detalhes.
 
 ---
 
-**Desenvolvido para o desafio técnico**
+**Desenvolvido para o desafio técnico da Klubi**
