@@ -57,29 +57,29 @@ Um buscador inteligente de carros desenvolvido em React + TypeScript, com assist
 #### Instalação
 
 1. Clone o repositório:
-\`\`\`bash
-git clone https://github.com/thalytaviana/Teste_Klubi
-cd Teste_Klubi/car-finder
-\`\`\`
+```bash
+git clone https://github.com/Inteli-College/2025-2A-T13-ES07-G01.git
+cd 2025-2A-T13-ES07-G01/Teste_Klubi/car-finder
+```
 
 2. Instale as dependências:
-\`\`\`bash
+```bash
 npm install
-\`\`\`
+```
 
 3. Rode o projeto:
-\`\`\`bash
+```bash
 npm run dev
-\`\`\`
+```
 
 4. Abra http://localhost:5173 no seu navegador
 
 #### Build para Produção
 
-\`\`\`bash
+```bash
 npm run build
 npm run preview
-\`\`\`
+```
 
 ## Tecnologias Utilizadas
 
@@ -91,7 +91,7 @@ npm run preview
 
 ## Estrutura do Projeto
 
-\`\`\`
+```
 src/
 ├── components/          # Componentes reutilizáveis
 │   ├── CarCard.tsx     # Card individual do carro
@@ -106,7 +106,7 @@ src/
 │   └── index.ts
 ├── App.tsx            # Componente principal
 └── index.css         # Estilos globais
-\`\`\`
+```
 
 ## Decisões Técnicas
 
