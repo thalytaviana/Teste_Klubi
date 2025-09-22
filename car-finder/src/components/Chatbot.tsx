@@ -294,9 +294,9 @@ const Chatbot = ({ cars, onCarSelect, isOpen, onToggle }: ChatbotProps) => {
     return (
       <button
         onClick={onToggle}
-        className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110 z-50"
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 bg-blue-600 hover:bg-blue-700 text-white p-3 md:p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110 z-50"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
       </button>
@@ -304,15 +304,15 @@ const Chatbot = ({ cars, onCarSelect, isOpen, onToggle }: ChatbotProps) => {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-96 h-[600px] bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col z-50">
+    <div className="fixed inset-x-4 bottom-4 md:bottom-6 md:right-6 md:left-auto md:inset-x-auto md:w-96 h-[70vh] md:h-[600px] bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col z-50 max-w-md md:max-w-none">
       {/* Header */}
-      <div className="bg-blue-600 text-white p-4 rounded-t-xl flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+      <div className="bg-blue-600 text-white p-3 md:p-4 rounded-t-xl flex items-center justify-between">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-500 rounded-full flex items-center justify-center text-sm md:text-base">
             🤖
           </div>
           <div>
-            <h3 className="font-semibold">CarBot</h3>
+            <h3 className="font-semibold text-sm md:text-base">CarBot</h3>
             <p className="text-xs opacity-90">Assistente de Carros</p>
           </div>
         </div>
@@ -320,37 +320,37 @@ const Chatbot = ({ cars, onCarSelect, isOpen, onToggle }: ChatbotProps) => {
           onClick={onToggle}
           className="text-white hover:bg-blue-500 p-1 rounded transition-colors"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 p-4 overflow-y-auto space-y-4">
+      <div className="flex-1 p-3 md:p-4 overflow-y-auto space-y-3 md:space-y-4">
         {messages.map((message) => (
           <div key={message.id} className={`flex ${message.isBot ? 'justify-start' : 'justify-end'}`}>
-            <div className={`max-w-[80%] p-3 rounded-lg ${
+            <div className={`max-w-[85%] md:max-w-[80%] p-2 md:p-3 rounded-lg ${
               message.isBot 
                 ? 'bg-gray-100 text-gray-800' 
                 : 'bg-blue-600 text-white'
             }`}>
-              <p className="text-sm whitespace-pre-line">{message.text}</p>
+              <p className="text-xs md:text-sm whitespace-pre-line leading-relaxed">{message.text}</p>
               
               {/* Mostrar carros sugeridos */}
               {message.cars && message.cars.length > 0 && (
-                <div className="mt-3 space-y-2">
+                <div className="mt-2 md:mt-3 space-y-2">
                   {message.cars.map((car, index) => (
-                    <div key={index} className="bg-white border border-gray-200 rounded-lg p-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                    <div key={index} className="bg-white border border-gray-200 rounded-lg p-2 md:p-3 cursor-pointer hover:bg-gray-50 transition-colors"
                          onClick={() => onCarSelect(car)}>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-semibold text-gray-900 text-sm">
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-gray-900 text-xs md:text-sm truncate">
                             {car.Name} {car.Model}
                           </h4>
-                          <p className="text-xs text-gray-500">{car.Location}</p>
+                          <p className="text-xs text-gray-500 truncate">{car.Location}</p>
                         </div>
-                        <p className="text-sm font-bold text-blue-600">
+                        <p className="text-xs md:text-sm font-bold text-blue-600 whitespace-nowrap">
                           {formatPrice(car.Price)}
                         </p>
                       </div>
@@ -365,7 +365,7 @@ const Chatbot = ({ cars, onCarSelect, isOpen, onToggle }: ChatbotProps) => {
         {/* Typing indicator */}
         {isTyping && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 p-3 rounded-lg">
+            <div className="bg-gray-100 p-2 md:p-3 rounded-lg">
               <div className="flex space-x-1">
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
@@ -379,20 +379,20 @@ const Chatbot = ({ cars, onCarSelect, isOpen, onToggle }: ChatbotProps) => {
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-3 md:p-4 border-t border-gray-200">
         <div className="flex gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Ex: Quero um carro elétrico até 100 mil..."
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            placeholder="Ex: Quero um carro até 100 mil..."
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs md:text-sm min-w-0"
           />
           <button
             onClick={handleSend}
             disabled={!input.trim() || isTyping}
-            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white px-4 py-2 rounded-lg transition-colors"
+            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white px-3 md:px-4 py-2 rounded-lg transition-colors flex-shrink-0"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
